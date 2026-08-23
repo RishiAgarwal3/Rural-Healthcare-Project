@@ -1,0 +1,5 @@
+recovery_status,compliant,non_compliant,partial
+fully_recovered,159,6,0
+improving,2,0,1
+unresolved,8,3,0
+worsening,1,1,0

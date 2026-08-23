@@ -1,0 +1,29 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Core  —  required by all three NLP stages
+# ──────────────────────────────────────────────────────────────────────────────
+tqdm>=4.66.0
+pydantic>=2.0.0
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Stage 2 Translation  —  install whichever backend(s) you intend to use
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Option A: OpenAI Chat Completions  (recommended for production)
+#    Contextual call-context strategy — full conversation in one API call.
+#    Uncomment to install:
+# openai>=1.30.0
+
+# ── Option B: Anthropic Claude Messages
+#    Same call-context strategy as OpenAI.
+#    Uncomment to install:
+# anthropic>=0.25.0
+
+# ── Option C: Local NLLB-200 (HuggingFace Transformers)
+#    Windowed-context strategy — no API key required, ~2–13 GB model download.
+#    Uncomment to install:
+# transformers>=4.40.0
+# sentencepiece>=0.2.0
+# accelerate>=0.28.0
+# torch>=2.2.0
+#   CPU-only PyTorch (smaller download — install with):
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu

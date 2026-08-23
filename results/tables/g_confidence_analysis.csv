@@ -1,0 +1,4 @@
+field,low_conf_count (<0.5),zero_conf_count,mean_conf
+patient_name,703,703,0.183
+recovery_status,84,84,0.644
+compliance,195,195,0.507

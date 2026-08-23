@@ -1,0 +1,5 @@
+recovery_status,high,low,medium
+fully_recovered,40,550,1
+improving,0,6,0
+unresolved,2,8,3
+worsening,2,5,0

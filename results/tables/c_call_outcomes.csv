@@ -1,0 +1,10 @@
+call_outcome,count
+informational,657
+no_action_needed,174
+medication_continued,17
+advised_clinic_visit,15
+escalation_recommended,10
+medication_stopped,6
+patient_unreachable,4
+follow_up_scheduled,3
+referred_elsewhere,1

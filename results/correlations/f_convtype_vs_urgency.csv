@@ -1,0 +1,9 @@
+conversation_type,high,low,medium
+chronic_condition_follow_up,7,80,0
+informational_outreach,1,14,0
+medication_inquiry,24,95,1
+recovery_check,4,49,1
+routine_follow_up,9,190,3
+specialist_referral,7,383,0
+test_follow_up,2,13,0
+unreachable,1,3,0

@@ -1,0 +1,33 @@
+column,dtype,non_null,null_count,null_pct,unique,sample
+call_id,float64,887,0,0.0,886,1767241522.10067
+call_date,float64,0,887,100.0,0,
+file_id,str,887,0,0.0,1,calls.jsonl
+duration_seconds,float64,887,0,0.0,1,0.0
+patient_name,str,184,703,79.26,122,Amara Bibi
+clinic_name,str,148,739,83.31,1,Maya Bhavan
+clinic_location,str,337,550,62.01,1,Krishna Chandrapur High School
+conversation_type,str,887,0,0.0,8,medication_inquiry
+call_outcome,str,887,0,0.0,9,medication_continued
+urgency_level,str,887,0,0.0,3,low
+follow_up_required,bool,887,0,0.0,2,False
+referral_needed,bool,887,0,0.0,2,False
+appointment_status,str,887,0,0.0,4,not_required
+clinic_closed_notice,bool,887,0,0.0,2,False
+family_health_mentions,bool,887,0,0.0,2,True
+recovery_status,str,887,0,0.0,6,fully_recovered
+patient_compliance,str,887,0,0.0,5,compliant
+doctor_specializations,str,865,22,2.48,11,eye|dental|general
+conditions_screened,str,744,143,16.12,68,eye|dental
+conditions_reported,str,24,863,97.29,6,iron_deficiency
+medicines,str,569,318,35.85,3,unspecified_medicine
+tests_recommended,str,316,571,64.37,6,x_ray
+advice_given,str,65,822,92.67,12,get_tested
+needs_manual_review,bool,887,0,0.0,2,False
+extraction_warnings,str,721,166,18.71,3,RECOVERY_STATUS_UNKNOWN: status not inferable from text.
+conf_patient_name,float64,887,0,0.0,2,0.88
+conf_recovery_status,float64,887,0,0.0,16,0.92
+conf_compliance,float64,887,0,0.0,13,0.92
+segment_count,int64,887,0,0.0,1,1
+flagged_segment_ratio,float64,887,0,0.0,1,0.0
+low_quality_segments,int64,887,0,0.0,1,0
+structured_summary,str,887,0,0.0,292,Amara Bibi was previously seen at the clinic. Patient report

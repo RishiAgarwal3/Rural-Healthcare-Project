@@ -1,0 +1,10 @@
+metric,value
+mean_words,126.17812852311161
+median_words,103.0
+max_words,14379.0
+min_words,14.0
+std_words,481.7481903342211
+mean_chars,740.8027057497181
+median_chars,596.0
+max_chars,85428.0
+min_chars,84.0

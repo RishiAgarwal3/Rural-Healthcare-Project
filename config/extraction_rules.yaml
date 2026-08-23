@@ -1,0 +1,750 @@
+# =============================================================================
+#  FinAI Voice Analytics — Extraction Rules Configuration
+# =============================================================================
+#  This YAML defines all pattern mappings used by scripts/improve_extraction.py
+#  to reduce "unknown" values across key clinical fields.
+#
+#  Structure per field:
+#    patterns:      high-confidence regex / keyword triggers (conf 0.85-1.0)
+#    fuzzy_phrases: fuzzy-match phrases (conf 0.70-0.85)
+#    negation_guard: phrases that cancel a positive match
+#    context_rules: fallback logic when neither pattern nor fuzzy fires
+#
+#  Language coverage: English, transliterated Bengali, Hinglish
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# CLINIC NAMES
+# Used to populate clinic.name when it is null.
+# Keys are canonical names; values are aliases / partial matches.
+# ---------------------------------------------------------------------------
+clinic_names:
+  "Maya Bhavan":
+    - "maya bhavan"
+    - "maya bhabn"
+    - "maya bhaban"
+    - "mayabhavan"
+    - "maya bhab"
+  "Krishna Chandrapur Clinic":
+    - "krishna chandrapur"
+    - "chandrapur clinic"
+    - "krishnachandrapur"
+
+# Default clinic inferred when location reference contains these keywords
+default_clinic_by_location:
+  "Krishna Chandrapur High School": "Krishna Chandrapur Clinic"
+
+# ---------------------------------------------------------------------------
+# RECOVERY STATUS
+# ---------------------------------------------------------------------------
+recovery_status:
+  fully_recovered:
+    confidence: 0.90
+    patterns:
+      # English explicit
+      - "completely well"
+      - "fully recovered"
+      - "completely healed"
+      - "completely resolved"
+      - "no issues? yes"
+      - "no remaining issue"
+      - "no more problem"
+      - "all fine now"
+      - "totally fine"
+      - "completely fine"
+      - "health is good"
+      - "doing well\\b"
+      - "feeling well"
+      - "no problem now"
+      - "problem is gone"
+      - "everything is fine"
+      - "has resolved"
+      - "has recovered"
+      - "\\brecovered\\b"
+      - "has improved completely"
+      - "no longer sick"
+      - "no further issues"
+      - "no issues now"
+      - "issue.{0,30}resolved"
+      - "issue.{0,30}completely"
+      - "issue.{0,30}gone"
+      - "\\bfine\\b.{0,30}(now|health)"
+      # Hinglish
+      - "theek ho gaya"
+      - "theek ho gayi"
+      - "bilkul theek"
+      - "poori tarah theek"
+      - "sab theek hai"
+      - "thik aachen"
+      - "thik achen"
+      # Transliterated Bengali
+      - "shustha aachen"
+      - "shushta achen"
+      - "bhalo aachen"
+      - "bhalo achen"
+      - "shompurno shustha"
+      - "shob theek"
+    fuzzy_phrases:
+      - "completely well now"
+      - "doing well now"
+      - "health is good"
+      - "feeling better completely"
+    negation_guard:
+      - "not well"
+      - "not fine"
+      - "not recovered"
+      - "not healed"
+      - "not doing well"
+
+  improving:
+    confidence: 0.80
+    patterns:
+      - "moderately well"
+      - "getting better"
+      - "improving"
+      - "a bit better"
+      - "somewhat better"
+      - "much better"
+      - "better now"
+      - "feeling better"
+      - "on the mend"
+      - "good improvement"
+      - "slowly recovering"
+      - "gradually improving"
+      - "little bit better"
+      - "slightly better"
+      # Hinglish
+      - "thoda theek"
+      - "dhire dhire theek"
+      - "kuch behtar"
+      # Transliterated Bengali
+      - "ektu bhalo"
+      - "aaste aaste bhalo"
+      - "khanikata bhalo"
+    fuzzy_phrases:
+      - "doing moderately well"
+      - "getting a little better"
+      - "slowly getting better"
+    negation_guard:
+      - "not getting better"
+      - "not improving"
+      - "not better"
+
+  unresolved:
+    confidence: 0.85
+    patterns:
+      - "still has the issue"
+      - "issue still there"
+      - "problem remains"
+      - "still not well"
+      - "still sick"
+      - "not getting relief"
+      - "\\bno relief\\b"
+      - "still suffering"
+      - "continues to have"
+      - "problem is still"
+      - "not resolving"
+      - "hasn't resolved"
+      - "issue persists"
+      - "still in pain"
+      - "ongoing issue"
+      - "continuing problem"
+      - "unresolved"
+      - "hasn't healed"
+      # Hinglish
+      - "abhi bhi taklif"
+      - "abhi bhi dard"
+      - "theek nahi hua"
+      - "theek nahi hui"
+      # Transliterated Bengali
+      - "ekhono bhalo hoyni"
+      - "ekhono shomossha"
+      - "sathe thakar shomossha"
+    fuzzy_phrases:
+      - "still not well"
+      - "problem still there"
+      - "not getting better at all"
+    negation_guard:
+      - "issue resolved"
+      - "problem solved"
+      - "all fine"
+
+  worsening:
+    confidence: 0.88
+    patterns:
+      - "getting worse"
+      - "worsening"
+      - "deteriorating"
+      - "condition worsened"
+      - "more pain now"
+      - "pain has increased"
+      - "more problems now"
+      - "issue has increased"
+      - "not well at all"
+      - "very bad now"
+      - "worse than before"
+      # Hinglish
+      - "zyada taklif"
+      - "zyada dard"
+      - "aur bura"
+      # Transliterated Bengali
+      - "aaro kharap"
+      - "beshi kharap"
+    fuzzy_phrases:
+      - "getting a lot worse"
+      - "condition is deteriorating"
+    negation_guard:
+      - "not getting worse"
+      - "not worsening"
+
+  # Context rules: infer from conversation when explicit status absent
+  context_inference:
+    fully_recovered_from_conversation_type:
+      # If conv_type is recovery_check AND the call ends positively
+      patterns:
+        - "stay well"
+        - "that's fine"
+        - "good to hear"
+    unknown_if_informational_outreach:
+      # Pure outreach calls without patient interaction → unknown is correct
+      applies_to_conv_types:
+        - informational_outreach
+        - unreachable
+
+# ---------------------------------------------------------------------------
+# PATIENT COMPLIANCE
+# ---------------------------------------------------------------------------
+patient_compliance:
+  compliant:
+    confidence: 0.88
+    patterns:
+      - "still taking medicine"
+      - "still taking medication"
+      - "taking the medicine"
+      - "taking medicine regularly"
+      - "continuing medicine"
+      - "continuing medication"
+      - "has been taking"
+      - "medicine is ongoing"
+      - "dawai chal raha hai"
+      - "dawai le raha hai"
+      - "dawai le rahi hai"
+      - "dawa chal raha"
+      - "medicine going on"
+      - "medicine is being taken"
+      - "taking the prescribed"
+      - "following the prescription"
+      - "on medication"
+      - "\\btaking drops\\b"
+      - "using the drops"
+      - "applying the medicine"
+      # Transliterated Bengali
+      - "oshudh khacchen"
+      - "oshudh khaleo"
+      - "oshudh nitechheno"
+      - "oshudh newa hocche"
+    fuzzy_phrases:
+      - "still taking the medicine"
+      - "medicine is continuing"
+      - "medicine going on regularly"
+    negation_guard:
+      - "not taking medicine"
+      - "stopped medicine"
+      - "stopped taking"
+      - "discontinued medicine"
+
+  non_compliant:
+    confidence: 0.88
+    patterns:
+      - "stopped taking medicine"
+      - "stopped medicine"
+      - "not taking medicine"
+      - "stopped medication"
+      - "discontinued medicine"
+      - "no longer taking"
+      - "medicine was stopped"
+      - "stopped the treatment"
+      - "left the medicine"
+      - "gave up medicine"
+      - "dawa band kar diya"
+      - "dawa band ho gaya"
+      - "dawai chhere diyeche"
+      - "oshudh khacchena"
+      - "oshudh bondho"
+      # Contextual: "no" directly after asking about medicine
+      - "are you still taking medicine.{0,30}no"
+    fuzzy_phrases:
+      - "stopped taking the medication"
+      - "no longer on medicine"
+      - "medicine has been stopped"
+    negation_guard:
+      - "not stopped medicine"
+      - "hasn't stopped"
+
+  partial:
+    confidence: 0.75
+    patterns:
+      - "sometimes takes medicine"
+      - "taking medicine irregularly"
+      - "misses doses"
+      - "occasionally takes"
+      - "forgets medicine"
+      - "sometimes forgets"
+      - "not regularly"
+      - "kabhi kabhi"
+      - "maje maje"
+    fuzzy_phrases:
+      - "sometimes takes the medicine"
+      - "taking medicine but not regularly"
+
+# ---------------------------------------------------------------------------
+# CALL OUTCOME
+# ---------------------------------------------------------------------------
+call_outcome:
+  advised_clinic_visit:
+    confidence: 0.88
+    patterns:
+      - "come and get checked"
+      - "please come and visit"
+      - "please visit the clinic"
+      - "visit us"
+      - "come to the clinic"
+      - "come here for a check"
+      - "you should come"
+      - "please come"
+      - "you can come"
+      - "ask them to come"
+      - "bring.{0,20}clinic"
+      - "clinic e ashte bolche"
+      - "clinic ashun"
+      - "aste bolun"
+      - "come and consult"
+      - "come for a checkup"
+      - "please get checked"
+      - "get checked here"
+    fuzzy_phrases:
+      - "please come and get checked"
+      - "you should visit the clinic"
+      - "please visit for a checkup"
+
+  follow_up_scheduled:
+    confidence: 0.85
+    patterns:
+      - "will call again"
+      - "we will follow up"
+      - "scheduled a visit"
+      - "appointment has been"
+      - "next appointment"
+      - "will come in.{0,20}day"
+      - "will come tomorrow"
+      - "will come day after"
+      - "will visit"
+      - "i will go"
+      - "\\bwill check\\b"
+      - "will contact again"
+    fuzzy_phrases:
+      - "we will call again"
+      - "patient will visit soon"
+
+  escalation_recommended:
+    confidence: 0.85
+    patterns:
+      - "need to escalate"
+      - "refer to specialist"
+      - "higher care"
+      - "emergency"
+      - "needs urgent attention"
+      - "very serious"
+      - "hospital admission"
+      - "admitted to hospital"
+      - "go to hospital immediately"
+    fuzzy_phrases:
+      - "needs urgent medical care"
+      - "should see specialist immediately"
+
+  medication_continued:
+    confidence: 0.80
+    patterns:
+      - "medicine is available here"
+      - "continue the medicine"
+      - "same medicine available"
+      - "prescription continues"
+      - "continue medication"
+      - "no change in medicine"
+    fuzzy_phrases:
+      - "medicine can be continued"
+
+  medication_stopped:
+    confidence: 0.80
+    patterns:
+      - "stopped the medicine"
+      - "medicine stopped"
+      - "no longer on medicine"
+      - "discontinued"
+
+  patient_unreachable:
+    confidence: 0.95
+    patterns:
+      - "patient was not available"
+      - "no one answered"
+      - "could not reach"
+      - "phone not answered"
+      - "not reachable"
+      - "not at home"
+      - "was not home"
+      - "\\bi am not at home\\b"
+
+  no_action_needed:
+    confidence: 0.75
+    patterns:
+      - "no action needed"
+      - "no further action"
+      - "that's fine"
+      - "all is well"
+      - "no issues"
+      - "nothing required"
+      - "no intervention"
+
+  informational:
+    confidence: 0.70
+    patterns:
+      - "just wanted to inform"
+      - "calling to inform"
+      - "just checking in"
+      - "general information"
+      - "please note that"
+      - "clinic is closed"
+      - "available here"
+      - "specialists are available"
+      - "doctors are available here"
+    # Lowest priority — applied only as fallback
+
+  referred_elsewhere:
+    confidence: 0.85
+    patterns:
+      - "referred to another"
+      - "seeing another doctor"
+      - "going to another doctor"
+      - "consulting elsewhere"
+      - "referred to specialist"
+      - "sent to hospital"
+
+# ---------------------------------------------------------------------------
+# TESTS RECOMMENDED
+# ---------------------------------------------------------------------------
+tests_recommended:
+  general:
+    - "x-ray"
+    - "xray"
+    - "blood test"
+    - "blood report"
+    - "sugar test"
+    - "blood sugar"
+    - "thyroid test"
+    - "eye test"
+    - "dental checkup"
+    - "urine test"
+    - "cholesterol test"
+    - "ecg"
+    - "ultrasound"
+    - "scan"
+    - "biopsy"
+    - "mri"
+    - "ct scan"
+    - "test korte"
+    - "test korbe"
+    - "test nite"
+    - "test korun"
+    - "check koran"
+    - "checkup"
+    - "eye checkup"
+    - "dental check"
+    - "photo"       # common rural word for X-ray
+    - "report korte"
+    - "investigation"
+  negation_guard:
+    - "don't get an x-ray"
+    - "unnecessary unless"
+    - "no need for test"
+    - "don't spend money on"
+
+# ---------------------------------------------------------------------------
+# ADVICE GIVEN
+# ---------------------------------------------------------------------------
+advice_given:
+  continue_medication:
+    - "continue medicine"
+    - "continue medication"
+    - "keep taking medicine"
+    - "don't stop medicine"
+    - "continue the drops"
+    - "dawa continue karo"
+  get_tested:
+    - "get a blood test"
+    - "get tested"
+    - "go for a test"
+    - "test korate hobe"
+    - "test korun"
+    - "get an x-ray"
+    - "get a checkup"
+  consult_doctor:
+    - "consult the doctor"
+    - "talk to the doctor"
+    - "ask the doctor"
+    - "see a doctor"
+    - "see a specialist"
+    - "doctor ke porun"
+    - "doctor ke jiggesh koren"
+  diet_and_lifestyle:
+    - "dietary restriction"
+    - "diet control"
+    - "no heavy work"
+    - "exercise"
+    - "rest"
+    - "avoid heavy lifting"
+  do_not_ignore:
+    - "don't ignore"
+    - "please don't ignore"
+    - "don't delay"
+    - "do not neglect"
+    - "get it checked soon"
+    - "take it seriously"
+  inform_neighbors:
+    - "inform your neighbors"
+    - "tell your neighbors"
+    - "pass on the information"
+
+# ---------------------------------------------------------------------------
+# CONDITIONS / DISEASES
+# ---------------------------------------------------------------------------
+conditions:
+  blood_pressure:
+    - "blood pressure"
+    - "high blood pressure"
+    - "bp"
+    - "hypertension"
+    - "pressure"
+    - "blood pressure problem"
+  diabetes:
+    - "diabetes"
+    - "sugar"
+    - "blood sugar"
+    - "diabetic"
+    - "sugar problem"
+  thyroid:
+    - "thyroid"
+    - "thyroid problem"
+    - "thyroid issue"
+  eye:
+    - "eye problem"
+    - "eye issue"
+    - "eye trouble"
+    - "cataract"
+    - "eye drops"
+    - "glasses"
+    - "vision"
+    - "eye specialist"
+    - "checkup for eye"
+  dental:
+    - "dental"
+    - "teeth"
+    - "tooth"
+    - "dental problem"
+    - "dental issue"
+    - "dentist"
+  heart:
+    - "heart"
+    - "heart problem"
+    - "heart specialist"
+    - "cardiac"
+    - "cardiologist"
+  skin:
+    - "skin"
+    - "skin problem"
+    - "skin issue"
+    - "eczema"
+    - "rash"
+    - "dermatologist"
+    - "skin specialist"
+  bone_nerve:
+    - "bone"
+    - "bone problem"
+    - "nerve"
+    - "nerve pain"
+    - "waist pain"
+    - "back pain"
+    - "degeneration"
+    - "bone degeneration"
+    - "orthopedic"
+  stomach:
+    - "stomach"
+    - "stomach pain"
+    - "stomach issue"
+    - "gastro"
+    - "acidity"
+    - "indigestion"
+  respiratory:
+    - "breathing"
+    - "breathing problem"
+    - "asthma"
+    - "cough"
+    - "cold"
+    - "respiratory"
+  fever:
+    - "fever"
+    - "temperature"
+    - "viral fever"
+
+# ---------------------------------------------------------------------------
+# MEDICINES (canonical names and aliases)
+# ---------------------------------------------------------------------------
+medicines:
+  eye_drops:
+    - "eye drops"
+    - "drops"
+    - "eye medicine"
+    - "chokher drop"
+    - "chokher oshudh"
+  calcium:
+    - "calcium"
+    - "calcium tablet"
+    - "calcium supplement"
+  blood_pressure_med:
+    - "bp medicine"
+    - "blood pressure medicine"
+    - "antihypertensive"
+    - "amlodipine"
+    - "telmisartan"
+    - "atenolol"
+  diabetes_med:
+    - "metformin"
+    - "insulin"
+    - "sugar medicine"
+    - "diabetic medicine"
+    - "glipizide"
+    - "glimepiride"
+  thyroid_med:
+    - "thyroxine"
+    - "thyroid medicine"
+    - "levothyroxine"
+    - "eltroxin"
+  pain_reliever:
+    - "painkiller"
+    - "pain medicine"
+    - "tablet for pain"
+    - "paracetamol"
+    - "ibuprofen"
+    - "diclofenac"
+  skin_cream:
+    - "skin cream"
+    - "ointment"
+    - "cream for skin"
+
+# ---------------------------------------------------------------------------
+# URGENCY
+# ---------------------------------------------------------------------------
+urgency:
+  high:
+    confidence: 0.90
+    patterns:
+      - "very serious"
+      - "emergency"
+      - "immediately"
+      - "urgent"
+      - "critical condition"
+      - "go to hospital now"
+      - "severe pain"
+      - "chest pain"
+      - "breathing difficulty"
+      - "unconscious"
+      - "not responding"
+  medium:
+    confidence: 0.80
+    patterns:
+      - "need to check soon"
+      - "should see doctor"
+      - "getting worse"
+      - "pain increasing"
+      - "come soon"
+      - "don't delay"
+      - "should not wait"
+  low:
+    confidence: 0.70
+    patterns:
+      - "routine checkup"
+      - "staying well"
+      - "no urgent issue"
+      - "just wanted to inform"
+      - "stay well"
+      - "general inquiry"
+
+# ---------------------------------------------------------------------------
+# CONVERSATION TYPE
+# ---------------------------------------------------------------------------
+conversation_type:
+  recovery_check:
+    - "how are you feeling"
+    - "how is he now"
+    - "how is she now"
+    - "are you well"
+    - "fully recovered"
+    - "feeling better"
+    - "health status"
+  medication_inquiry:
+    - "still taking medicine"
+    - "taking the medicine"
+    - "medicine available"
+    - "same medicine"
+    - "prescription"
+  specialist_referral:
+    - "specialist"
+    - "heart specialist"
+    - "eye specialist"
+    - "dental specialist"
+    - "dermatologist"
+    - "referred to"
+  test_follow_up:
+    - "test result"
+    - "report ready"
+    - "x-ray report"
+    - "blood test result"
+  appointment_scheduling:
+    - "appointment"
+    - "schedule a visit"
+    - "book a visit"
+    - "when can you come"
+  chronic_condition_follow_up:
+    - "sugar is under control"
+    - "blood pressure under control"
+    - "chronic condition"
+    - "long term condition"
+    - "diabetes management"
+  informational_outreach:
+    - "doctors are available"
+    - "specialists sit here"
+    - "please inform your neighbors"
+    - "general information"
+    - "closed on friday"
+  unreachable:
+    - "not at home"
+    - "not reachable"
+    - "phone not answered"
+    - "no one picked up"
+
+# ---------------------------------------------------------------------------
+# CONFIDENCE THRESHOLDS
+# ---------------------------------------------------------------------------
+confidence_thresholds:
+  min_for_assignment: 0.55   # Below this → keep unknown, mark for review
+  high: 0.85                  # High confidence (regex / exact pattern match)
+  medium: 0.70                # Medium confidence (fuzzy match)
+  low: 0.55                   # Low confidence (contextual fallback)
+  manual_review_below: 0.60   # All fields below this trigger needs_manual_review
+
+# ---------------------------------------------------------------------------
+# FUZZY MATCHING SETTINGS
+# ---------------------------------------------------------------------------
+fuzzy_matching:
+  default_threshold: 82       # Minimum score out of 100 (rapidfuzz ratio)
+  partial_ratio_threshold: 78
+  token_sort_threshold: 80
